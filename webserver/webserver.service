@@ -1,0 +1,17 @@
+[Unit]
+Description=Web Frontend for Hackathon
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker build -t %n-img  /home/ubuntu/webserver/
+ExecStart=/usr/bin/docker run --rm --name %n
+ExecStop=/usr/bin/docker stop -t 10 %n
+ExecStopPost=/usr/bin/docker rm -f %n
+
+[Install]
+WantedBy=multi-user.target
