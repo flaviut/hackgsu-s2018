@@ -51,14 +51,14 @@ def log():
         'SELECT water_level,entry_time FROM entries ORDER BY entry_time DESC')
     entries = cur.fetchall()
 
-    return jsonify([{"water_level": row[0], "time": row[1]} for row in entries])
+    return jsonify([{"level": row[0], "time": row[1]} for row in entries])
 
 
 @app.route('/add', methods=['POST'])
 def add_record():
     data = request.get_json(force=True)
     db = get_db()
-    entry_value = round(data['water_level'] * 4) / 4.0
+    entry_value = round(data['level'] * 4) / 4.0
     time = datetime.now()
     db.execute(
         "INSERT INTO entries (water_level, entry_time)"

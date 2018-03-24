@@ -5,3 +5,6 @@ services:
         ports:
         - "80:80"
         restart: always
+        volumes:
+          - /home/ubuntu/webserver-log/:/var/log/
+          - /home/ubuntu/db.sqlite3:/var/www/apache-flask/app/db.sqlite3
