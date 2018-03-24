@@ -1,4 +1,4 @@
-#include <CapacitiveSensor.h>
+#include "CapacitiveSensor.h"
 
 
 CapacitiveSensor sensor = CapacitiveSensor(4,2);
