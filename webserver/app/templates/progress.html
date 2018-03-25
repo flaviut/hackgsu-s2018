@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Progress</h1>
+    <table class="table">
+        <tbody>
+        <tr>
+            <td> <p> Water in Bottle: </p> <p id="progress"> </p> </td>
+            <td> <div class="wrapper" data-anim="base wrapper">
+                <div class="circle" data-anim="base left"></div>
+                <div class="circle" data-anim="base right"></div>
+            </div>
+            </td>
+        </tr>
+        <tr>
+            <td> <p> Bottles Completed: </p> <p id="progress2"> </p> </td>
+            <td> <div class="wrapper" data-anim="base wrapper">
+                <div class="circle" data-anim="base left"></div>
+                <div class="circle" data-anim="base right"></div>
+            </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/progress_circle.css') }}">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+    <script>
+        setInterval(function () {
+            $.ajax({
+                url: '/last_level',
+                type: 'GET',
+                success: function (response) {
+                    document.getElementById("progress").innerHTML = response;
+                    document.getElementById("progress2").innerHTML = response;
+                    console.log(response);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }, 1000);
+
+    </script>
+
+{% endblock %}

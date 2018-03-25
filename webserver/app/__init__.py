@@ -26,6 +26,6 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
-from app import routes
+import routes
 
 __all__ = ['routes', 'app']

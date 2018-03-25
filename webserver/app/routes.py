@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import request, g, jsonify, render_template
 
-from app import app
+from . import app
 
 
 def connect_db():
@@ -63,3 +63,19 @@ def add_record():
         "VALUES (?, ?)", [entry_value, time.isoformat()])
     db.commit()
     return jsonify({"level": entry_value, "time": time})
+
+
+@app.route('/last_level')
+def last_level():
+    db = get_db()
+    cur = db.execute(
+        'SELECT water_level FROM entries ORDER BY entry_time DESC LIMIT 1')
+    entries = cur.fetchall()
+    for row in entries:
+        return jsonify(row[0])
+    return jsonify(0.0)
+
+@app.route("/status")
+def status():
+    return render_template("progress.html", progress=last_level())
+
