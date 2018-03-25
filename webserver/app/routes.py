@@ -89,15 +89,14 @@ def bottles_completed():
     db = get_db()
     cur = db.execute(
         'SELECT water_level FROM entries '
-        'WHERE entry_time > ? and entry_time < ? '
-        'ORDER BY entry_time ASC', [(begin - epoch).total_seconds() * 1000.0, (end - epoch).total_seconds() * 1000.0])
+        #'WHERE entry_time > ? and entry_time < ? '
+        'ORDER BY entry_time ASC') #[(begin - epoch).total_seconds() * 1000.0, (end - epoch).total_seconds() * 1000.0])
     entries = cur.fetchall()
     last = 0
     total = 0
     for row in entries:
         if last > 0 and int(row[0]) == 0:
             total += 1
-            print(total)
         last = row[0]
     return str((total/4.0)*100) + "%  [" + "#" * int((total/4)*10) + "-" * int(10-((total/4)*10)) + "]"
 
