@@ -1,16 +1,20 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <table>
+    <h1>Full Cup History</h1>
+    <table class="table">
         <thead>
         <tr>
             <td>Time</td>
-            <td>Fullness</td>
+            <td>Water Level</td>
         </tr>
         </thead>
         <tbody>
         {% for entry in entries %}
-
+            <tr>
+                <td>{{ entry[0] }}</td>
+                <td>{{ entry[1] }}</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>

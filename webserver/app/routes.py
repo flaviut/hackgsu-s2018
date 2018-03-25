@@ -2,7 +2,7 @@
 import sqlite3
 from datetime import datetime
 
-from flask import request, g, jsonify
+from flask import request, g, jsonify, render_template
 
 from app import app
 
@@ -49,9 +49,7 @@ def log():
     db = get_db()
     cur = db.execute(
         'SELECT water_level,entry_time FROM entries ORDER BY entry_time DESC')
-    entries = cur.fetchall()
-
-    return jsonify([{"level": row[0], "time": row[1]} for row in entries])
+    return render_template("log.html", entries=cur.fetchall())
 
 
 @app.route('/add', methods=['POST'])
