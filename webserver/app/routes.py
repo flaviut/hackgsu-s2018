@@ -72,10 +72,33 @@ def last_level():
         'SELECT water_level FROM entries ORDER BY entry_time DESC LIMIT 1')
     entries = cur.fetchall()
     for row in entries:
-        return jsonify(row[0])
+        return str(row[0]*100) + "%  [" + "#" * int((row[0]*10)) + "-" * int(10-(row[0]*10)) + "]"
     return jsonify(0.0)
 
-@app.route("/status")
+
+@app.route("/")
 def status():
     return render_template("progress.html", progress=last_level())
+
+
+@app.route("/bottles_completed")
+def bottles_completed():
+    begin = datetime.now().replace(hour=0, minute=0, second=0)
+    end = datetime.now().replace(hour=23, minute=59, second=59)
+    epoch = datetime.utcfromtimestamp(0)
+    db = get_db()
+    cur = db.execute(
+        'SELECT water_level FROM entries '
+        'WHERE entry_time > ? and entry_time < ? '
+        'ORDER BY entry_time ASC', [(begin - epoch).total_seconds() * 1000.0, (end - epoch).total_seconds() * 1000.0])
+    entries = cur.fetchall()
+    last = 0
+    total = 0
+    for row in entries:
+        if last > 0 and int(row[0]) == 0:
+            total += 1
+            print(total)
+        last = row[0]
+    return str((total/4.0)*100) + "%  [" + "#" * int((total/4)*10) + "-" * int(10-((total/4)*10)) + "]"
+
 
