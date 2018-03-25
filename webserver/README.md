@@ -5,17 +5,10 @@ Boilerplate from
 
 # Updating the server
 
-## On your computer
-
-- copy the data over: `scp -r ./webserver
-  root@ec2-54-175-172-96.compute-1.amazonaws.com:/etc/docker/compose/webserver`
-- ssh in: `ssh ubuntu@ec2-54-175-172-96.compute-1.amazonaws.com`
-
-## on the server
-
-- Stop the server: `sudo systemctl stop docker-compose@webserver`
-- Delete the server: `sudo docker rmi webserver_web`
-- Fix permissions on the files: `sudo chmod -R o+r,g+rw /etc/docker/compose/*`
-- Restart the server: `sudo systemctl start docker-compose@webserver`
+- caution: the local database will overwrite the remote database unless it is
+  deleted before running the command.
+- copy the data over: `cd webserver; scp -r apache-flask.conf apache-flask.wsgi
+  app docker-compose.yml Dockerfile README.md run.py
+  root@ec2-54-175-172-96.compute-1.amazonaws.com:/var/www/apache-flask/`
 - View logs: `journalctl --follow`/`journalctl --since='5 minutes ago'`/`cat
   ~/webserver-log/apache/error.log`.
