@@ -17,4 +17,5 @@ Boilerplate from
 - Delete the server: `sudo docker rmi webserver_web`
 - Fix permissions on the files: `sudo chmod -R o+r,g+rw /etc/docker/compose/*`
 - Restart the server: `sudo systemctl start docker-compose@webserver`
-- View logs: `journalctl --follow`/`journalctl --since='5 minutes ago'`
+- View logs: `journalctl --follow`/`journalctl --since='5 minutes ago'`/`cat
+  ~/webserver-log/apache/error.log`.
