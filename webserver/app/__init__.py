@@ -1,6 +1,7 @@
 import os
 
-import babel
+import dateutil
+from datetime import datetime
 from flask import Flask
 
 app = Flask(__name__)
@@ -17,7 +18,10 @@ def format_datetime(value, format='medium'):
         format = "EEEE, d. MMMM y 'at' HH:mm"
     elif format == 'medium':
         format = "EE dd.MM.y HH:mm"
-    return babel.dates.format_datetime(value, format)
+    try:
+        return datetime.strptime(format, value)
+    except AttributeError:
+        return datetime.strptime(dateutil.parser.parse(format, value))
 
 
 app.jinja_env.filters['datetime'] = format_datetime

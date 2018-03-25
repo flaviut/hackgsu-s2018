@@ -4,12 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "==0.12.*"
+Flask = "==0.12.*"
 itsdangerous = "*"
-"jinja2" = "==2.10.*"
-markupsafe = "*"
-werkzeug = "*"
-babel = "*"
+"Jinja2" = "==2.10.*"
+MarkupSafe = "*"
+Werkzeug = "*"
+Babel = "*"
+python-dateutil = "*"
 
 [dev-packages]
 
