@@ -1,24 +1,40 @@
-# coding=utf-8
-import sqlite3
+import os
+
+from flask import Flask
+
+application = Flask(__name__)
+app = application
+POSTGRES = {
+    'user': os.environ['RDS_USERNAME'],
+    'password': os.environ['RDS_PASSWORD'],
+    'database': os.environ['RDS_DB_NAME'],
+    'host': os.environ['RDS_HOSTNAME'],
+    'port': os.environ['RDS_PORT'],
+}
+
+application.config.update(dict(
+    DATABASE=POSTGRES,
+    SECRET_KEY='development key',
+    USERNAME='admin',
+    PASSWORD='default'
+))
+
+
 from datetime import datetime
+import psycopg2
 
 from flask import request, g, jsonify, render_template
 
-from . import app
-
-
 def connect_db():
     """Connects to the specific database."""
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
+    rv = psycopg2.connect(**app.config['DATABASE'])
     return rv
 
 
 def init_db():
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.commit()
+        db.execute(f.read())
 
 
 @app.cli.command('initdb')
@@ -34,7 +50,10 @@ def get_db():
     """
     if not hasattr(g, 'sqlite_db'):
         g.sqlite_db = connect_db()
-    return g.sqlite_db
+        g.sqlite_db.autocommit=True
+        init_db()
+    cursor = g.sqlite_db.cursor()
+    return cursor
 
 
 @app.teardown_appcontext
@@ -47,9 +66,9 @@ def close_db(error):
 @app.route('/log')
 def log():
     db = get_db()
-    cur = db.execute(
+    db.execute(
         'SELECT water_level,entry_time FROM entries ORDER BY entry_time DESC')
-    return render_template("log.html", entries=cur.fetchall())
+    return render_template("log.html", entries=db)
 
 
 @app.route('/add', methods=['POST'])
@@ -61,7 +80,6 @@ def add_record():
     db.execute(
         "INSERT INTO entries (water_level, entry_time)"
         "VALUES (?, ?)", [entry_value, time.isoformat()])
-    db.commit()
     return jsonify({"level": entry_value, "time": time})
 
 
@@ -70,13 +88,12 @@ def last_level():
     db = get_db()
     cur = db.execute(
         'SELECT water_level FROM entries ORDER BY entry_time DESC LIMIT 1')
-    entries = cur.fetchall()
-    for row in entries:
+    for row in db:
         return str(row[0]*100) + "%  [" + "#" * int((row[0]*10)) + "-" * int(10-(row[0]*10)) + "]"
     return jsonify(0.0)
 
 
-@app.route("/")
+@app.route("/status")
 def status():
     return render_template("progress.html", progress=last_level())
 
@@ -91,13 +108,13 @@ def bottles_completed():
         'SELECT water_level FROM entries '
         #'WHERE entry_time > ? and entry_time < ? '
         'ORDER BY entry_time ASC') #[(begin - epoch).total_seconds() * 1000.0, (end - epoch).total_seconds() * 1000.0])
-    entries = cur.fetchall()
     last = 0
     total = 0
-    for row in entries:
+    for row in db:
         if last > 0 and int(row[0]) == 0:
             total += 1
         last = row[0]
     return str((total/4.0)*100) + "%  [" + "#" * int((total/4)*10) + "-" * int(10-((total/4)*10)) + "]"
 
-
+if __name__ == "__main__":
+    application.run()
